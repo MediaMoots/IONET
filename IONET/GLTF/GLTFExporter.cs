@@ -177,9 +177,9 @@ namespace IONET.GLTF
 
             ViewNode(modelRoot.LogicalScenes[0].VisualChildren.FirstOrDefault(), "");
 
-            modelRoot.SaveGLTF(filePath, new WriteSettings()
+            modelRoot.Save(filePath, new WriteSettings()
             {
-                JsonIndented = true,
+                JsonIndented = true
             });
         }
 
