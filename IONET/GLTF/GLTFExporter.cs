@@ -240,6 +240,7 @@ namespace IONET.GLTF
 
             ViewNode(modelRoot.LogicalScenes[0].VisualChildren.FirstOrDefault(), "");
 
+            // Allow for glb by using Save()
             modelRoot.Save(filePath, new WriteSettings()
             {
                 JsonIndented = true
