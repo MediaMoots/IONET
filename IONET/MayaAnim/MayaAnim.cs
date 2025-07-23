@@ -262,7 +262,7 @@ namespace IONET.MayaAnim
                 file.WriteLine("timeUnit " + header.timeUnit + ";");
                 file.WriteLine("linearUnit " + header.linearUnit + ";");
                 file.WriteLine("angularUnit " + header.angularUnit + ";");
-                file.WriteLine("startTime " + 1 + ";");
+                file.WriteLine("startTime " + header.startTime + ";");
                 file.WriteLine("endTime " + header.endTime + ";");
 
                 int Row = 0;
@@ -344,6 +344,10 @@ namespace IONET.MayaAnim
             track.PreWrap = CurveWrapModes.FirstOrDefault(x => x.Value == data.preInfinity).Key;
             track.PostWrap = CurveWrapModes.FirstOrDefault(x => x.Value == data.postInfinity).Key;
 
+            bool isRotate = track.ChannelType == IOAnimationTrackType.RotationEulerX ||
+                            track.ChannelType == IOAnimationTrackType.RotationEulerY ||
+                            track.ChannelType == IOAnimationTrackType.RotationEulerZ;
+
             foreach (var key in data.keys)
             {
                 if (key.intan == "fixed" || key.outtan == "fixed" ||
@@ -352,9 +356,9 @@ namespace IONET.MayaAnim
                     track.KeyFrames.Add(new IOKeyFrameHermite()
                     {
                         Frame = key.input - header.startTime,
-                        Value = GetOutputValue(this, data, key.output),
-                        TangentSlopeInput = GetOutputValue(this, data, key.t1),
-                        TangentSlopeOutput = GetOutputValue(this, data, key.t2),
+                        Value = GetOutputValue(this, data, key.output, isRotate),
+                        TangentSlopeInput = GetOutputValue(this, data, key.t1, isRotate),
+                        TangentSlopeOutput = GetOutputValue(this, data, key.t2, isRotate),
                         TangentWeightInput = key.w1,
                         TangentWeightOutput = key.w2,
                     });
@@ -364,7 +368,7 @@ namespace IONET.MayaAnim
                     track.KeyFrames.Add(new IOKeyFrame()
                     {
                         Frame = key.input - header.startTime,
-                        Value = GetOutputValue(this, data, key.output),
+                        Value = GetOutputValue(this, data, key.output, isRotate),
                     });
                 }
             }
@@ -381,12 +385,12 @@ namespace IONET.MayaAnim
             { IOCurveWrapMode.Oscillate, InfinityType.oscillate },
         };
 
-        private float GetOutputValue(MayaAnim anim, AnimData data, float value)
+        private float GetOutputValue(MayaAnim anim, AnimData data, float value, bool isRotate)
         {
-            if (data.output == OutputType.angular)
+            if (data.output == OutputType.angular || isRotate)
             {
                 if (anim.header.angularUnit == "deg")
-                    return (float)(value * Math.PI / 180);
+                    return (float)(value * (Math.PI / 180));
             }
             return value;
         }
@@ -400,8 +404,8 @@ namespace IONET.MayaAnim
         static MayaAnim CreateMayaAnimation(ExportSettings settings, IOAnimation animation, IOSkeleton skeleton)
         {
             MayaAnim anim = new MayaAnim();
-            anim.header.startTime = 0;
-            anim.header.endTime = animation.EndFrame != 0 ? animation.EndFrame :  animation.GetFrameCount();
+            anim.header.startTime = 1;
+            anim.header.endTime = animation.EndFrame != 0 ? animation.EndFrame :  animation.GetFrameCount() + anim.header.startTime;
             if (!settings.MayaAnimUseRadians)
                 anim.header.angularUnit = "deg";
 
