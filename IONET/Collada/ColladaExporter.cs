@@ -102,7 +102,7 @@ namespace IONET.Collada
             if (scene.Nodes.Count > 0) //custom node tree
             {
                 foreach (var mod in scene.Models)
-                    nodes.AddRange(ProcessNodeTree(scene, mod));
+                    nodes.AddRange(ProcessNodeTree(scene, mod, settings.ExportAsDecomposed));
             }
             else
             {
@@ -324,7 +324,7 @@ namespace IONET.Collada
         /// 
         /// </summary>
         /// <param name="model"></param>
-        private List<Node> ProcessNodeTree(IOScene scene, IOModel model)
+        private List<Node> ProcessNodeTree(IOScene scene, IOModel model, bool decompose)
         {
             List<Node> nodes = new List<Node>();
 
@@ -332,12 +332,12 @@ namespace IONET.Collada
 
             foreach (var n in scene.Nodes)
                 if (n.Parent == null)
-                    nodes.Add(ProcessNode(n, scene, model, bones));
+                    nodes.Add(ProcessNode(n, scene, model, bones, decompose));
 
             return nodes;
         }
 
-        private Node ProcessNode(IONode node, IOScene scene, IOModel model, List<string> bones)
+        private Node ProcessNode(IONode node, IOScene scene, IOModel model, List<string> bones, bool decompose)
         {
             Node n = new Node()
             {
@@ -354,15 +354,12 @@ namespace IONET.Collada
             if (node.Mesh != null)
                 n = ProcessMesh(node.Mesh, model, node.Parent);
 
-            if (IsNodeAnimated(scene.Animations, n.ID))
+            if (IsNodeAnimated(scene.Animations, n.ID) || decompose)
             {
-                Matrix4x4.Decompose(node.LocalTransform, out Vector3 scale, out Quaternion rotation, out Vector3 translation);
-
-                var pos = translation;
-                var rot = ToEulerAngles(rotation);
-                var sca = scale;
+                var pos = node.Translation;
+                var rot = node.RotationEuler;
+                var sca = node.Scale;
                
-
                 n.Matrix = null;
                 n.Translate = new Translate[1];
                 n.Rotate = new Rotate[3];
@@ -381,7 +378,7 @@ namespace IONET.Collada
 
             int childIndex = 0;
             foreach (IONode child in node.Children)
-                n.node[childIndex++] = ProcessNode(child, scene, model, bones);
+                n.node[childIndex++] = ProcessNode(child, scene, model, bones, decompose);
 
             return n;
         }

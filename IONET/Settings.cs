@@ -111,6 +111,11 @@ namespace IONET
         /// <summary>
         /// 
         /// </summary>
+        public bool ExportAsDecomposed { get; set; } = true;
+
+        /// <summary>
+        /// 
+        /// </summary>
         [Category("Misc"), DisplayName("Blender Mode"), Description("Helps with blender compatibility (DAE ONLY)")]
         public bool BlenderMode { get; set; } = true;
 
