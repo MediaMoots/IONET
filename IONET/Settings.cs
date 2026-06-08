@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Numerics;
 
 namespace IONET
 {
@@ -59,6 +60,9 @@ namespace IONET
         /// </summary>
         [Category("Materials"), DisplayName("Split Meshes by Materials"), Description("Splits meshes with multiple materials")]
         public bool SplitMeshMaterials { get; set; } = true;
+
+        [Category("Animations"), DisplayName("Frame Rate"), Description("Sets the currently used frame rate used by GLTF")]
+        public float FrameRate { get; set; } = 24;
     }
 
     public class ExportSettings
@@ -107,6 +111,11 @@ namespace IONET
         /// <summary>
         /// 
         /// </summary>
+        public bool ExportAsDecomposed { get; set; } = true;
+
+        /// <summary>
+        /// 
+        /// </summary>
         [Category("Misc"), DisplayName("Blender Mode"), Description("Helps with blender compatibility (DAE ONLY)")]
         public bool BlenderMode { get; set; } = true;
 
@@ -125,5 +134,10 @@ namespace IONET
         /// 
         /// </summary>
         public bool MayaAnimUseRadians { get; set; } = true;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Matrix4x4 GlobalTransform = Matrix4x4.Identity;
     }
 }

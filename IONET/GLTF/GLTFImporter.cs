@@ -57,7 +57,7 @@ namespace IONET.GLTF
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public IOScene GetScene(string filePath)
+        public IOScene GetScene(string filePath, ImportSettings settings)
         {
             // generate a new scene
             IOScene scene = new IOScene();
@@ -107,7 +107,7 @@ namespace IONET.GLTF
                         IOAnimationTrack X = new IOAnimationTrack(type + 0);
                         IOAnimationTrack Y = new IOAnimationTrack(type + 1);
                         IOAnimationTrack Z = new IOAnimationTrack(type + 2);
-                        IOAnimationTrack W = new IOAnimationTrack(type + 2);
+                        IOAnimationTrack W = new IOAnimationTrack(type + 3);
                         group.Tracks.Add(X);
                         group.Tracks.Add(Y);
                         group.Tracks.Add(Z);
